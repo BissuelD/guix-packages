@@ -170,8 +170,8 @@
       "-DDOWNLOAD_KIM=no"
       "-C ../cmake/presets/most.cmake"                      ; manually added by DB
       "-DPKG_VORONOI=no"                                    ; for now, adding it later
-      "-D LAMMPS_MACHINE=serial"                            ; manually added by DB
-      "-D BUILD_MPI=no"                                     ; manually added by DB
+      "-D LAMMPS_MACHINE=mpi"                               ; manually added by DB
+      "-D BUILD_MPI=yes"                                    ; manually added by DB
       ;; End of the additions ... for now ;) ;;
       (string-append "-DN2P2_DIR=" (assoc-ref %build-inputs "n2p2-lib"))
       (string-append "-DCMAKE_INSTALL_PREFIX=" (assoc-ref %outputs "out")))
