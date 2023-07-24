@@ -1,8 +1,8 @@
 (define-module (custom my-hello)
-    #:use-modules (guix packages)
-    #:use-modules (guix download)
-    #:use-modules (guix build-system gnu)
-    #:use-modules (guix licenses))
+    #:use-module (guix packages)
+    #:use-module (guix download)
+    #:use-module (guix build-system gnu)
+    #:use-module (guix licenses))
 
 (package
   (name "my-hello")
