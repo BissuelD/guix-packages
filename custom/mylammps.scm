@@ -24,6 +24,7 @@
       #:use-module (gnu packages pkg-config)
       #:use-module (gnu packages video)
       #:use-module (gnu packages llvm)
+      #:use-module (gnu packages ssh) ;; newer one
       #:use-module (gnu packages multiprecision))
 
 
@@ -220,6 +221,8 @@
       ;;    > libreadline8 ?
       ;;    > valgring ?
       ;;    > gdb ?
+      ;;    > openssh
+      ("openssh", openssh)
       ;; End of the additions ... for now ;) ;;
       ("n2p2-lib" ,n2p2-lib)          ; Because we don't build it manually on the fly, although I think
                                       ; it can easily be worked around. Not done because it is slower ?
