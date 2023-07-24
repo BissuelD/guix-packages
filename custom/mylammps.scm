@@ -170,8 +170,8 @@
       "-DDOWNLOAD_KIM=no"
       "-C ../cmake/presets/most.cmake"                      ; manually added by DB
       "-DPKG_VORONOI=no"                                    ; for now, adding it later
-      "-D LAMMPS_MACHINE=mpi "                              ; manually added by DB
-      "-D BUILD_MPI=yes"                                    ; manually added by DB
+      "-D LAMMPS_MACHINE=serial"                            ; manually added by DB
+      "-D BUILD_MPI=no"                                     ; manually added by DB
       ;; End of the additions ... for now ;) ;;
       (string-append "-DN2P2_DIR=" (assoc-ref %build-inputs "n2p2-lib"))
       (string-append "-DCMAKE_INSTALL_PREFIX=" (assoc-ref %outputs "out")))
@@ -222,7 +222,7 @@
       ;;    > valgring ?
       ;;    > gdb ?
       ;;    > autossh
-      ("autossh", autossh)
+      ;("autossh", autossh)
       ;; End of the additions ... for now ;) ;;
       ("n2p2-lib" ,n2p2-lib)          ; Because we don't build it manually on the fly, although I think
                                       ; it can easily be worked around. Not done because it is slower ?
