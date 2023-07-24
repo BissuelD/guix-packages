@@ -1,4 +1,4 @@
-(define-module (mylammps)
+(define-module (custom mylammps)
       #:use-module ((guix licenses) #:prefix license:)
       #:use-module (guix packages)
       #:use-module (guix download)
@@ -236,4 +236,3 @@
   (description "LAMMPS is a classical molecular dynamics simulator designed to run efficiently on parallel computers.  LAMMPS has potentials for solid-state materials (metals, semiconductors), soft matter (biomolecules, polymers), and coarse-grained or mesoscopic systems.  It can be used to model atoms or, more generically, as a parallel particle simulator at the atomic, meso, or continuum scale.")
   (home-page "http://lammps.sandia.gov/")
   (license license:gpl2+)))
-mylammps
