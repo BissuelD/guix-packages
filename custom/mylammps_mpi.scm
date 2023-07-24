@@ -222,12 +222,12 @@
       ;;    > valgring ?
       ;;    > gdb ?
       ;;    > autossh
-      ("mpich", mpich) ; necessary for parallel run to avoid ssh/rsh errors ?
+      ;("mpich", mpich) ; necessary for parallel run to avoid ssh/rsh errors ?
       ;; End of the additions ... for now ;) ;;
       ("n2p2-lib" ,n2p2-lib)          ; Because we don't build it manually on the fly, although I think
                                       ; it can easily be worked around. Not done because it is slower ?
                                       ; or less reproducible ? (more likely)
-      ;("openmpi" ,openmpi)            ; covers for openmpi-bin ? libopenmpi-dev ? mpi-default-bin ?
+      ("openmpi" ,openmpi)            ; covers for openmpi-bin ? libopenmpi-dev ? mpi-default-bin ?
       ("ffmpeg" ,ffmpeg)              ; covers for ffmpeg
       ("libpng" ,libpng)              ; covers for libpng-dev
       ("libjpeg" ,libjpeg-turbo)      ; covers for libjpeg-dev
