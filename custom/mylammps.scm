@@ -221,8 +221,8 @@
       ;;    > libreadline8 ?
       ;;    > valgring ?
       ;;    > gdb ?
-      ;;    > openssh
-      ("openssh", openssh)
+      ;;    > autossh
+      ("autossh", autossh)
       ;; End of the additions ... for now ;) ;;
       ("n2p2-lib" ,n2p2-lib)          ; Because we don't build it manually on the fly, although I think
                                       ; it can easily be worked around. Not done because it is slower ?
