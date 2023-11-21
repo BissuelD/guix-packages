@@ -22,7 +22,7 @@
         (uri "https://math.lbl.gov/voro++/download/dir/voro++-0.4.6.tar.gz")
         (sha256 (base32 "0zj3xbrqf8sm49yhypy23k3w9786r94kcwm8v803ikp23q3p0ygg"))))
     (inputs
-     (list gawk gzip gcc-13))
+     (list gawk gzip gcc))
     (build-system gnu-build-system)
     (arguments 
       `(#:phases
