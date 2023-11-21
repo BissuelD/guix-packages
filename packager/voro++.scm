@@ -28,9 +28,9 @@
       `(#:phases
          (modify-phases %standard-phases
 	         (delete `configure)
-	         ;(delete `install)
-	         (replace `install
-	          (invoke "make" "install"))
+	         (delete `install)
+	        ;(replace `install
+	        ; (invoke "make" "install"))
 	   )
         #:tests? #f))
     (license license:gpl3+)))

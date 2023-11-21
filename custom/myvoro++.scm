@@ -43,7 +43,8 @@
   (arguments
    `(#:phases
       (modify-phases %standard-phases
-        (delete 'configure))
+        (delete 'configure)
+        (delete `install))
       #:tests? #f))
       ;#:tests? #f)))
   (inputs
