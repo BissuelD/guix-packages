@@ -1,31 +1,11 @@
-;(define-module (custom myvoro++)
 (define-module (myvoro++)
       #:use-module ((guix licenses) #:prefix license:)
       #:use-module (guix packages)
       #:use-module (guix download)
-;;    #:use-module (guix utils)
-;;    #:use-module (guix build utils)
-;;    #:use-module (guix build-system cmake)
       #:use-module (guix build-system gnu)
-;;    #:use-module (gnu packages)
-;;    #:use-module (gnu packages base) ;; new one
       #:use-module (gnu packages algebra)
-;;    #:use-module (gnu packages image-processing)
-;;    #:use-module (gnu packages image)
-;;    #:use-module (gnu packages graphics)
-;;    #:use-module (gnu packages maths)
-;;    #:use-module (gnu packages mpi)
-;;    #:use-module (gnu packages cmake) ;; new one
-;;    #:use-module (gnu packages python)
-;;    #:use-module (gnu packages python-xyz)
       #:use-module (gnu packages compression)
-;;    #:use-module (gnu packages commencement)
       #:use-module (gnu packages gcc)
-;;    #:use-module (gnu packages vim) ;; new one
-;;    #:use-module (gnu packages pkg-config)
-;;    #:use-module (gnu packages video)
-;;    #:use-module (gnu packages llvm)
-;;    #:use-module (gnu packages multiprecision)
       )
 
 
@@ -55,7 +35,6 @@
       #:tests? #f))
   (inputs
      `(("gcc" ,gcc)                    ; covers for libgcc-s1 ? And libc6 ? And libstdc++6 ?
-     ;;("pkg-config" ,pkg-config)      ; why is it mandatory ?
        ("gzip" ,gzip)))                ; why is this mandatory ? -> Because we pull a .tar.gz ?
   (native-inputs
     `(("bc" ,bc)))
