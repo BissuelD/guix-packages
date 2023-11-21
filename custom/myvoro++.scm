@@ -44,9 +44,15 @@
    `(#:phases
       (modify-phases %standard-phases
         (delete 'configure)
-        (delete `install))
+        (replace 'install
+             (lambda* (#:key outputs inputs #:allow-other-keys)
+                (let* ((out (assoc-ref outputs "out"))
+                    (bindir (string-append out "/bin"))
+                    (libdir (string-append out "/lib")))
+                    (for-each (lambda (f) (install-file f libdir))
+                             (find-files "./src/" "\\.a"))
+                    (install-file "./src/voro++" bindir)))))
       #:tests? #f))
-      ;#:tests? #f)))
   (inputs
      `(("gcc" ,gcc)                    ; covers for libgcc-s1 ? And libc6 ? And libstdc++6 ?
      ;;("pkg-config" ,pkg-config)      ; why is it mandatory ?
