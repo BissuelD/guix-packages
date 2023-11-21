@@ -1,4 +1,5 @@
-(define-module (custom mylammps_mpi)
+;(define-module (custom mylammps_mpi)
+(define-module (mylammps_mpi) 
       #:use-module ((guix licenses) #:prefix license:)
       #:use-module (guix packages)
       #:use-module (guix download)

@@ -1,4 +1,5 @@
-(define-module (custom myvoro++)
+;(define-module (custom myvoro++)
+(define-module (myvoro++)
       #:use-module ((guix licenses) #:prefix license:)
       #:use-module (guix packages)
       #:use-module (guix download)
@@ -8,7 +9,7 @@
       #:use-module (guix build-system gnu)
 ;;    #:use-module (gnu packages)
 ;;    #:use-module (gnu packages base) ;; new one
-;;    #:use-module (gnu packages algebra)
+      #:use-module (gnu packages algebra)
 ;;    #:use-module (gnu packages image-processing)
 ;;    #:use-module (gnu packages image)
 ;;    #:use-module (gnu packages graphics)
@@ -17,7 +18,7 @@
 ;;    #:use-module (gnu packages cmake) ;; new one
 ;;    #:use-module (gnu packages python)
 ;;    #:use-module (gnu packages python-xyz)
-;;    #:use-module (gnu packages compression)
+      #:use-module (gnu packages compression)
 ;;    #:use-module (gnu packages commencement)
       #:use-module (gnu packages gcc)
 ;;    #:use-module (gnu packages vim) ;; new one
@@ -42,17 +43,13 @@
   (arguments
    `(#:phases
       (modify-phases %standard-phases
-        ;;(add-after 'unpack 'post-unpack
-          ;;(lambda* (#:key outputs inputs #:allow-other-keys)))
-        (replace 'configure
-          (lambda* (#:key inputs outputs #:allow-other-keys)
-            (let ((out (assoc-ref outputs "out")))
-              (apply invoke "make")))))
+        (delete 'configure))
       #:tests? #f))
+      ;#:tests? #f)))
   (inputs
-     (("gcc" ,gcc)                    ; covers for libgcc-s1 ? And libc6 ? And libstdc++6 ?
-    ;;("pkg-config" ,pkg-config)      ; why is it mandatory ?
-      ("gzip" ,gzip)))                ; why is this mandatory ? -> Because we pull a .tar.gz ?
+     `(("gcc" ,gcc)                    ; covers for libgcc-s1 ? And libc6 ? And libstdc++6 ?
+     ;;("pkg-config" ,pkg-config)      ; why is it mandatory ?
+       ("gzip" ,gzip)))                ; why is this mandatory ? -> Because we pull a .tar.gz ?
   (native-inputs
     `(("bc" ,bc)))
   (synopsis "Voro++, a 3D cell-based Voronoi library")
