@@ -131,7 +131,42 @@
     (home-page "https://openkim.org/")
     (license license:lgpl2.1+)))
 
-
+(define-public voro-lib
+  (package
+  (name "voro-lib")
+  (version "0.4.6")
+  (source (origin
+            (method url-fetch)
+	    (uri (string-append "https://math.lbl.gov/voro++/download/dir/voro++-" version ".tar.gz"))
+            (sha256
+             (base32
+              "0zj3xbrqf8sm49yhypy23k3w9786r94kcwm8v803ikp23q3p0ygg"))))
+  (build-system gnu-build-system)
+  (arguments
+   `(#:phases
+      (modify-phases %standard-phases
+        (delete 'configure)
+        (replace 'install
+             (lambda* (#:key outputs inputs #:allow-other-keys)
+                (let* ((out (assoc-ref outputs "out"))
+                    ;(bindir (string-append out "/bin"))  ; not necessary if we only need it as an external library ?
+                    (incdir (string-append out "/include"))
+                    (libdir (string-append out "/lib")))
+                    ;(install-file "./src/voro++" bindir) ; not necessary if we only need it as an external library ?
+                    (for-each (lambda (f) (install-file f incdir))
+                             (find-files "./src/" "\\.hh"))
+                    (for-each (lambda (f) (install-file f libdir))
+                             (find-files "./src/" "\\.a"))))))
+      #:tests? #f))
+  (inputs
+     `(("gcc" ,gcc)
+       ("gzip" ,gzip)))
+  (native-inputs
+    `(("bc" ,bc)))
+  (synopsis "Voro++, a 3D cell-based Voronoi library")
+  (description "Voro++ is a software library for carrying out three-dimensional computations of the Voronoi tessellation. A distinguishing feature of the Voro++ library is that it carries out cell-based calculations, computing the Voronoi cell for each particle individually, rather than computing the Voronoi tessellation as a global network of vertices and edges. It is particularly well-suited for applications that rely on cell-based statistics, where features of Voronoi cells (eg. volume, centroid, number of faces) can be used to analyze a system of particles.")
+  (home-page "http://math.lbl.gov/voro++/")
+  (license license:gpl2+)))
 
 (define-public mylammps
   (package
@@ -168,10 +203,15 @@
       ;; It is also a nice exercice with new dependances. ;;
       "-DPKG_KIM=yes"
       "-DDOWNLOAD_KIM=no"
-      "-C ../cmake/presets/most.cmake"                      ; manually added by DB
-      "-DPKG_VORONOI=no"                                    ; for now, adding it later
-      "-D LAMMPS_MACHINE=serial"                            ; manually added by DB
-      "-D BUILD_MPI=no"                                     ; manually added by DB
+      "-C ../cmake/presets/most.cmake"                       ; manually added by DB
+      "-DDOWNLOAD_VORONOI=no"                                ; manually added by DB
+      "-DPKG_VORONOI=yes"                                    ; DB currently adding it
+      (string-append "-DVORO_LIBRARY="                        ; Pointing directly to libvoro++.a
+        (assoc-ref %build-inputs "voro-lib") "/lib/libvoro++.a") ; as recommended in the documentation (DB)
+      (string-append "-DVORO_INCLUDE_DIR="                    ; Pointing to the directory with voro++ include files
+        (assoc-ref %build-inputs "voro-lib") "/include")         ; as recommended in the documentation (DB)
+      "-D LAMMPS_MACHINE=serial"                             ; manually added by DB
+      "-D BUILD_MPI=no"                                      ; manually added by DB
       ;; End of the additions ... for now ;) ;;
       (string-append "-DN2P2_DIR=" (assoc-ref %build-inputs "n2p2-lib"))
       (string-append "-DCMAKE_INSTALL_PREFIX=" (assoc-ref %outputs "out")))
@@ -213,7 +253,7 @@
       ;;    > libexpat1 ?
       ;;    > libhwloc15 ?
       ;;    > libltdl7 ?
-      ;;    > libvoro++1 ?
+      ("voro-lib" ,voro-lib)  ;; > libvoro++1 ?
       ;;    > rsync ?
       ;;    > libudev1 ?
       ;;    > eigen ?

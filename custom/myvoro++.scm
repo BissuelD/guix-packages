@@ -28,9 +28,12 @@
              (lambda* (#:key outputs inputs #:allow-other-keys)
                 (let* ((out (assoc-ref outputs "out"))
                     (bindir (string-append out "/bin"))
+                    (incdir (string-append out "/include"))
                     (libdir (string-append out "/lib")))
                     (for-each (lambda (f) (install-file f libdir))
                              (find-files "./src/" "\\.a"))
+                    (for-each (lambda (f) (install-file f incdir))
+                             (find-files "./src/" "\\.hh"))
                     (install-file "./src/voro++" bindir)))))
       #:tests? #f))
   (inputs
