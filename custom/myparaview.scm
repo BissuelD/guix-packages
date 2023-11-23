@@ -4,6 +4,11 @@
     #:use-module (guix packages)
     #:use-module (gnu packages compression)
     #:use-module (guix build-system copy)
+    #:use-module (gnu packages gcc)
+    #:use-module (gnu packages llvm)
+    ;#:use-module (gnu packages algebra)
+    #:use-module (gnu packages maths)
+    #:use-module (gnu packages python)
 )
 
 (define-public myparaview
@@ -12,9 +17,11 @@
   (version "5.12.0-RC1-MPI-Linux-Python3.10-x86_64")
   (source (origin
     (method url-fetch)
-	  ;(uri `("https://www.paraview.org/paraview-downloads/download.php?submit=Download&version=v5.12&type=binary&os=Linux&downloadFile=ParaView-" version ".tar.gz"))
-    (uri `("https://www.paraview.org/paraview-downloads/"))
-    (file-name (string-append "download.php?submit=Download&version=v5.12&type=binary&os=Linux&downloadFile=ParaView-" version ".tar.gz"))
+	  (uri (string-append 
+            "https://www.paraview.org/paraview-downloads/download.php?submit=";))
+            "Download&version=v5.12&type=binary&os=Linux&downloadFile=ParaView-";))
+            version ".tar.gz"))
+    (file-name (string-append name "-" version ".tar.gz"))
           (sha256
           (base32
             "0phblim3av1l8rjj9n9wdgcgvgm9x4sfyv7y2dg5fpb9vjf8ksgz"))))
@@ -25,8 +32,14 @@
         ("lib" "lib")
         ("plugins" "plugins")
         ("share" "share"))))
-  ;(inputs
-  ;   `(("gcc" ,gcc)                    ; covers for libgcc-s1 ? And libc6 ? And libstdc++6 ?
+  (inputs
+     `(("gcc" ,gcc)
+       ("libomp" ,libomp)
+       ;("eigen" ,eigen)
+       ("openblas" ,openblas)
+       ("python" ,python-wrapper)
+       ("gfortran" ,gfortran)
+      ))                    ; covers for libgcc-s1 ? And libc6 ? And libstdc++6 ?
   ;     ("gzip" ,gzip)))                ; why is this mandatory ? -> Because we pull a .tar.gz ?
   ;(native-inputs
   ;  `(("bc" ,bc)))
