@@ -4,10 +4,6 @@
     #:use-module (guix packages)
     #:use-module (gnu packages compression)
     #:use-module (guix build-system copy)
-    #:use-module (gnu packages gcc)
-    #:use-module (gnu packages llvm)
-    ;#:use-module (gnu packages algebra)
-    #:use-module (gnu packages maths)
     #:use-module (gnu packages python)
 )
 
@@ -27,22 +23,34 @@
             "0phblim3av1l8rjj9n9wdgcgvgm9x4sfyv7y2dg5fpb9vjf8ksgz"))))
   (build-system copy-build-system)
   (arguments
-   `(#:install-plan
-      `(("bin" "bin")
-        ("lib" "lib")
-        ("plugins" "plugins")
-        ("share" "share"))))
+   `(#:phases 
+    (modify-phases %standard-phases
+	    (add-after 'unpack 'chmod
+	      (lambda* (#:key #:allow-other-keys)
+	        (chmod "bin/paraview" #o755)))
+      ;(delete `validate-runpath)
+    )
+    #:substitutable? #f
+    #:install-plan '(
+      ("bin" "bin")
+      ("lib" "lib")
+      ("plugins" "plugins")
+      ("share" "share")
+    )))
   (inputs
-     `(("gcc" ,gcc)
-       ("libomp" ,libomp)
-       ;("eigen" ,eigen)
-       ("openblas" ,openblas)
-       ("python" ,python-wrapper)
-       ("gfortran" ,gfortran)
-      ))                    ; covers for libgcc-s1 ? And libc6 ? And libstdc++6 ?
-  ;     ("gzip" ,gzip)))                ; why is this mandatory ? -> Because we pull a .tar.gz ?
+     `(
+      ("python" ,python)
+      ("python-2" ,python-2)
+      ))
   ;(native-inputs
   ;  `(("bc" ,bc)))
+  (native-search-paths
+   (list (search-path-specification
+          (variable "LD_LIBRARY_PATH")
+          (files (list "lib" "lib/catalyst" "lib/mesa" "lib/mpi")))
+          (search-path-specification
+          (variable "RUNPATH")
+          (files (list "lib" "lib/catalyst" "lib/mesa" "lib/mpi")))))
   (synopsis "ParaView is the world’s leading open source post-processing visualization engine.")
   (description "ParaView is the world’s leading open source post-processing visualization engine. It integrates with your existing tools and workflows, allowing you to build visualizations to analyze data quickly. With its open, flexible, and intuitive user interface, you can analyze extremely large datasets interactively in 3D or programmatically using ParaView’s batch processing.")
   (home-page "https://www.paraview.org/")
