@@ -28,7 +28,7 @@
 	    (add-after 'unpack 'chmod
 	      (lambda* (#:key #:allow-other-keys)
 	        (chmod "bin/paraview" #o755)))
-      ;(delete `validate-runpath)
+      (delete `validate-runpath)
     )
     #:substitutable? #f
     #:install-plan '(
