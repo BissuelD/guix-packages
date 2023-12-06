@@ -1,10 +1,15 @@
 (define-module (myvesta)
     #:use-module ((guix licenses) #:prefix license:)
+    #:use-module (guix build-system copy)
     #:use-module (guix download)
     #:use-module (guix packages)
+    #:use-module (guix profiles)
     #:use-module (gnu packages compression)
+    #:use-module (gnu packages elf)
+    #:use-module (gnu packages gcc)
+    #:use-module (gnu packages gl)
     #:use-module (gnu packages gtk)
-    #:use-module (guix build-system copy)
+    #:use-module (gnu packages llvm)
 )
 
 (define-public myvesta
@@ -16,41 +21,41 @@
 	  (uri (string-append 
             "https://jp-minerals.org/vesta/archives/"
             version "/VESTA-gtk3.tar.bz2"))
-    ;(file-name (string-append name "-" version ".tar.gz2"))
           (sha256
           (base32
             "1y4dhqhk0jy7kbkkx2c6lsrm5lirn796mq67r5j1s7xkq8jz1gkq"))))
   (build-system copy-build-system)
+  ; switch build system ?
+  ; include patchelf and/or patchelf-plan ?
   (arguments
    `(#:phases 
     (modify-phases %standard-phases
-	    ;(add-after 'unpack 'chmod
+      (add-after `unpack 'check-setup
+        (lambda* (#:key inputs #:allow-other-keys)
+          (setenv "DT_RUNPATH" (string-append (assoc-ref inputs "gcc") "/lib")))) ; this doesn't seem to work ? VARIABLE ??
+      ;(add-after 'unpack 'chmod
 	    ;  (lambda* (#:key #:allow-other-keys)
 	    ;    (chmod "VESTA" #o755)))
-      (delete `validate-runpath)
+      ;(delete `validate-runpath)
     )
     #:substitutable? #f
     #:install-plan '(
       ("." "bin")
-      ;("lib" "lib")
-      ;("plugins" "plugins")
-      ;("share" "share")
     )))
   (inputs
-     `(
+    `(
+      ("gcc" ,gcc)
       ("gtk+" ,gtk+)
-      ;("python" ,python)
-      ;("python-2" ,python-2)
-      ))
-  ;(native-inputs
-  ;  `(("bc" ,bc)))
-  ;(native-search-paths
-  ; (list (search-path-specification
+      ;("libomp" ,libomp)
+      ("mesa-utils" ,mesa-utils)
+    ))
+  (search-paths
+   (list (search-path-specification
   ;        (variable "LD_LIBRARY_PATH")
   ;        (files (list "lib" "lib/catalyst" "lib/mesa" "lib/mpi")))
   ;        (search-path-specification
-  ;        (variable "RUNPATH")
-  ;        (files (list "lib" "lib/catalyst" "lib/mesa" "lib/mpi")))))
+          (variable "LD_LIBRARY_PATH")
+          (files (list "bin" (assoc-ref inputs "gcc"))))))
   (synopsis "VESTA - Visualization for Electronic and STructural Analysis.")
   (description "VESTA is a 3D visualization program for structural models, volumetric data such as electron/nuclear densities, and crystal morphologies.")
   (home-page "https://jp-minerals.org/vesta/en/")
