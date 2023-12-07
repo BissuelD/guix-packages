@@ -11,6 +11,7 @@
     #:use-module (gnu packages gl)
     #:use-module (gnu packages glib)
     #:use-module (gnu packages gtk)
+    #:use-module (gnu packages java)
     #:use-module (gnu packages llvm)
     #:use-module (gnu packages xorg)
     #:use-module (nonguix build-system binary)
@@ -29,14 +30,13 @@
           (base32
             "1y4dhqhk0jy7kbkkx2c6lsrm5lirn796mq67r5j1s7xkq8jz1gkq"))))
   (build-system binary-build-system)
-  ; switch build system ? -- OK (nonguix binary-buld-system)
-  ; include patchelf and/or patchelf-plan ? (included in ^)
   (arguments
    `(
     #:strip-binaries? #f 
     #:patchelf-plan 
-     (let ((libs '("cairo"
-                   ;"fontconfig"
+     (let ((libs '("at-spi2-core"
+                   "cairo"
+                   "fontconfig-minimal"
                    "gcc"
                    "gdk-pixbuf"
                    "glib"
@@ -45,32 +45,43 @@
                    "gtk+" 
                    "libomp"
                    "libx11"
+                   "libxtst"
                    "libxxf86vm"
                    "mesa"
+                   "openjdk"
                    "pango")))
      `(("libVESTA.so" ,libs)
        ("VESTA"       ,libs)
        ("VESTA-core"  ,libs)
        ("VESTA-gui"   ,libs)
-       ("madel"       ,libs)))
-    ;#:validate-runpath? #f
+       ("madel"       ,libs)
+       ("PowderPlot/libswt-atk-gtk-3346.so"   ,libs)
+       ("PowderPlot/libswt-awt-gtk-3346.so"   ,libs)
+       ("PowderPlot/libswt-pi-gtk-3346.so"    ,libs)
+       ("STRUCTURE_TIDY/structure_tidy"       ,libs)
+       ))
+    #:validate-runpath? #f
     #:install-plan '(
       ("." "bin")
     )))
   (native-inputs (list patchelf))
   (inputs
-   (list  cairo
-          ;fontconfig
+   (list  at-spi2-core
+          cairo
+          fontconfig
     (list gcc "lib")
           gdk-pixbuf
           glib
           glibc
           glu
           gtk+
+          gtk+-2
           libomp
           libx11
+          libxtst
           libxxf86vm
           mesa
+          openjdk
           pango)
   )
   (synopsis "VESTA - Visualization for Electronic and STructural Analysis.")
