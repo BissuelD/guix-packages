@@ -1,10 +1,13 @@
 (define-module (myparaview)
     #:use-module ((guix licenses) #:prefix license:)
+    ;#:use-module (guix build utils)
     #:use-module (guix download)
     #:use-module (guix packages)
     #:use-module (gnu packages compression)
-    #:use-module (guix build-system copy)
+    ;#:use-module (guix build-system copy)
+    #:use-module (gnu packages elf)
     #:use-module (gnu packages python)
+    #:use-module (nonguix build-system binary)
 )
 
 (define-public myparaview
@@ -21,36 +24,39 @@
           (sha256
           (base32
             "0phblim3av1l8rjj9n9wdgcgvgm9x4sfyv7y2dg5fpb9vjf8ksgz"))))
-  (build-system copy-build-system)
+  (build-system binary-build-system)
   (arguments
-   `(#:phases 
-    (modify-phases %standard-phases
-	    (add-after 'unpack 'chmod
-	      (lambda* (#:key #:allow-other-keys)
-	        (chmod "bin/paraview" #o755)))
-      (delete `validate-runpath)
-    )
-    #:substitutable? #f
+   `(
+    #:strip-binaries? #f 
+    #:patchelf-plan 
+     (let ((libs '( ; exemple
+                  ; "gcc"
+                  ; "glib"
+                  ; "glibc"
+                  ; "libomp"
+                   ;"python-2"
+                   "python"))
+          )
+     `(("bin/*"      ,libs)
+       ("bin/paraview-real" ,libs) 
+       ))
+    #:validate-runpath? #t
     #:install-plan '(
       ("bin" "bin")
       ("lib" "lib")
       ("plugins" "plugins")
       ("share" "share")
     )))
+  (native-inputs (list patchelf))
   (inputs
-     `(
-      ("python" ,python)
-      ("python-2" ,python-2)
-      ))
-  ;(native-inputs
-  ;  `(("bc" ,bc)))
-  (native-search-paths
-   (list (search-path-specification
-          (variable "LD_LIBRARY_PATH")
-          (files (list "lib" "lib/catalyst" "lib/mesa" "lib/mpi")))
-          (search-path-specification
-          (variable "RUNPATH")
-          (files (list "lib" "lib/catalyst" "lib/mesa" "lib/mpi")))))
+   (list  ; exemple
+    ;(list gcc "lib")
+    ;      glib
+    ;      glibc
+    ;      libomp
+          ;python-2
+          python)
+  )
   (synopsis "ParaView is the world’s leading open source post-processing visualization engine.")
   (description "ParaView is the world’s leading open source post-processing visualization engine. It integrates with your existing tools and workflows, allowing you to build visualizations to analyze data quickly. With its open, flexible, and intuitive user interface, you can analyze extremely large datasets interactively in 3D or programmatically using ParaView’s batch processing.")
   (home-page "https://www.paraview.org/")
