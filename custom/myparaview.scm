@@ -69,7 +69,9 @@
 (define-public myparaview
   (package
     (name "myparaview")
-    (version "5.11.1")
+    ;(version "5.11.1")
+    ;(version "5.12.0-RC1")
+    (version "5.12.0-RC2")
     (source
      (origin
        (method git-fetch)
@@ -79,7 +81,9 @@
              (recursive? #t)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0m1lgkl95f0pyhxp97gq2rf8hibv39v4c49imfj1va40z0flvard"))
+        ;(base32 "0m1lgkl95f0pyhxp97gq2rf8hibv39v4c49imfj1va40z0flvard")) ;; hash for v5.11.1
+        ;(base32 "17y77fhaajzzhg888p3dbz1yjzb4qdv1ix15h6k37d6a81afs9k0")) ;; hash for v5.12.0-RC1
+        (base32 "04jly67xh71b7pym1nmfyzdgscm1ik16wd177d96fi48p21bdf4s")) ;; hash for v5.12.0-RC2
        (modules '((guix build utils)))
        (snippet
         ;; TODO: Also remove unused bundled libraries and plugins?
@@ -99,6 +103,7 @@
                         "protobuf"))
             ;; Remove undesired ParaView plugins.
             (delete-file-recursively "Plugins/pvNVIDIAIndeX")
+            (delete-file-recursively "Plugins/GeographicalMap")
             ;; Remove bundled VTK libraries which are available in Guix.
             (for-each (lambda (dir)
                         (delete-file-recursively
@@ -204,7 +209,7 @@
            ;;"-DPARAVIEW_PLUGIN_ENABLE_AdiosReaderStaging=ON"
            "-DPARAVIEW_PLUGIN_ENABLE_CAVEInteraction=ON"
            ;;"-DPARAVIEW_PLUGIN_ENABLE_CDIReader=ON"
-           "-DPARAVIEW_PLUGIN_ENABLE_GeographicalMap=ON"
+           ;;"-DPARAVIEW_PLUGIN_ENABLE_GeographicalMap=ON" ;; COMMENT THIS ???
            "-DPARAVIEW_PLUGIN_ENABLE_GmshIO=ON"
            "-DPARAVIEW_PLUGIN_ENABLE_InSituExodus=ON"
            ;;"-DPARAVIEW_PLUGIN_ENABLE_LookingGlass=ON"
