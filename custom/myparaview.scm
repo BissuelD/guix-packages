@@ -2,54 +2,26 @@
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (guix gexp)
-  ;#:use-module (guix utils)
-  ;#:use-module (guix download)
   #:use-module (guix git-download)
   #:use-module (guix build-system qt)
-  ;#:use-module (guix build-system cmake)
-  ;#:use-module (guix build-system gnu)
-  ;#:use-module (guix build-system python)
-  ;#:use-module (gnu packages)
   #:use-module (gnu packages algebra)
-  ;#:use-module (gnu packages bison)
   #:use-module (gnu packages boost)
-  ;#:use-module (gnu packages check)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages cpp)
   #:use-module (gnu packages curl)
-  ;#:use-module (gnu packages docbook)
   #:use-module (gnu packages documentation)
-  ;#:use-module (gnu packages flex)
   #:use-module (gnu packages fontutils)
-  ;#:use-module (gnu packages game-development)
   #:use-module (gnu packages gcc)
-  ;#:use-module (gnu packages gd)
   #:use-module (gnu packages geo)
-  ;#:use-module (gnu packages ghostscript)
-  ;#:use-module (gnu packages gimp)
   #:use-module (gnu packages gl)
-  ;#:use-module (gnu packages glib)
-  ;#:use-module (gnu packages gnome)
-  ;#:use-module (gnu packages graphics)
   #:use-module (gnu packages graphviz)
-  ;#:use-module (gnu packages gstreamer)
-  ;#:use-module (gnu packages gtk)
-  ;#:use-module (gnu packages icu4c)
   #:use-module (gnu packages image)
-  ;#:use-module (gnu packages imagemagick)
-  ;#:use-module (gnu packages linux)
   #:use-module (gnu packages maths)
   #:use-module (gnu packages mpi)
-  ;#:use-module (gnu packages opencl)
-  ;#:use-module (gnu packages pdf)
   #:use-module (gnu packages perl)
-  ;#:use-module (gnu packages photo)
-  ;#:use-module (gnu packages pkg-config)
   #:use-module (gnu packages pretty-print)
   #:use-module (gnu packages protobuf)
   #:use-module (gnu packages python)
-  ;#:use-module (gnu packages python-check)
-  ;#:use-module (gnu packages python-science)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages sdl)
@@ -58,8 +30,6 @@
   #:use-module (gnu packages sqlite)
   #:use-module (gnu packages tbb)
   #:use-module (gnu packages textutils)
-  ;#:use-module (gnu packages tls)
-  ;#:use-module (gnu packages version-control)
   #:use-module (gnu packages video)
   #:use-module (gnu packages xiph)
   #:use-module (gnu packages xml)
@@ -103,7 +73,7 @@
                         "protobuf"))
             ;; Remove undesired ParaView plugins.
             (delete-file-recursively "Plugins/pvNVIDIAIndeX")
-            (delete-file-recursively "Plugins/GeographicalMap")
+            (delete-file-recursively "Plugins/GeographicalMap") ;; Not supported anymore.
             ;; Remove bundled VTK libraries which are available in Guix.
             (for-each (lambda (dir)
                         (delete-file-recursively
@@ -209,8 +179,7 @@
            ;;"-DPARAVIEW_PLUGIN_ENABLE_AdiosReaderStaging=ON"
            "-DPARAVIEW_PLUGIN_ENABLE_CAVEInteraction=ON"
            ;;"-DPARAVIEW_PLUGIN_ENABLE_CDIReader=ON"
-           ;;"-DPARAVIEW_PLUGIN_ENABLE_GeographicalMap=ON" ;; COMMENT THIS ???
-           "-DPARAVIEW_PLUGIN_ENABLE_GmshIO=ON"
+           ;;"-DPARAVIEW_PLUGIN_ENABLE_GeographicalMap=ON" ;; Not supported anymore           "-DPARAVIEW_PLUGIN_ENABLE_GmshIO=ON"
            "-DPARAVIEW_PLUGIN_ENABLE_InSituExodus=ON"
            ;;"-DPARAVIEW_PLUGIN_ENABLE_LookingGlass=ON"
            "-DPARAVIEW_PLUGIN_ENABLE_NetCDFTimeAnnotationPlugin=ON"
