@@ -173,13 +173,17 @@
 (define-public mylammps_mpi
   (package
   (name "mylammps_mpi")
-  (version "patch_2Jul2021")
+  ;(version "patch_2Jul2021")
+  ;(version "stable_2Aug2023")
+  (version "stable_2Aug2023_update2")
   (source (origin
             (method url-fetch)
             (uri (string-append "https://github.com/lammps/lammps/archive/refs/tags/" version ".tar.gz"))
             (sha256
              (base32
-              "0mzagwvrk97pyqjlpqpb487887xffc5na5l70k00k26yvfi8rpag"))))
+              ;"0mzagwvrk97pyqjlpqpb487887xffc5na5l70k00k26yvfi8rpag")))) ;; for version patch_2Jul2021
+              ;"1pzpax15dd8d29z5bb07jzlgrqy3rdd2fli0xa09ws430l5qpp28")))) ;; for version stable_2Aug2023
+              "0jjn7pyxkf4x7ksarsyqxbvhb1f554nvb2frwjjd025dkjycmkiv")))) ;; for version stable_2Aug2023_update2
   (build-system cmake-build-system)
   (arguments
    `(#:configure-flags
@@ -222,11 +226,18 @@
         (add-after 'unpack 'post-unpack
           (lambda* (#:key outputs inputs #:allow-other-keys)
             (mkdir-p "./build")
-            (chdir "./build")))
+            (chdir "./build")
+            (substitute* "../cmake/Modules/LAMMPSUtils.cmake" ; [DB] NECESSARY FOR VERSION stable_2Aug2023
+              (("if.NOT sum STREQUAL oldsum.")                ; [DB] AND LATER BECAUSE FetchPotentials() 
+               "if(FALSE)")                                   ; [DB] CRASHES AT DOWNLOAD (GUIX ONLY, HOSTNAME
+            )                                                 ; [DB] NOT RESOLVED) AND I CAN'T UNDERSTAND WHY.
+          )
+        )
         (replace 'configure
           (lambda* (#:key inputs outputs configure-flags #:allow-other-keys)
             (let ((out (assoc-ref outputs "out")))
               (apply invoke "cmake" "../cmake" configure-flags)))))
+              ;(invoke "cmake" "--version"))))) ; 3.24.2 ;; [DB] NOT CAUSING THE HASH PROBLEM -- SEE ABOVE
       #:tests? #f))
   (inputs
     `(("python" ,python-wrapper)      ; not sure it is mandatory as we don't build the python utilitaries
