@@ -25,7 +25,9 @@
       #:use-module (gnu packages pkg-config)
       #:use-module (gnu packages video)
       #:use-module (gnu packages llvm)
-      #:use-module (gnu packages multiprecision))
+      #:use-module (gnu packages multiprecision)
+      ;#:use-module (gnu packages tls) ;; [DB] SOLUTION 2, openssl, NOT WORKING
+      )
 
 
 (define-public n2p2-lib
@@ -149,10 +151,10 @@
         (replace 'install
              (lambda* (#:key outputs inputs #:allow-other-keys)
                 (let* ((out (assoc-ref outputs "out"))
-                    ;(bindir (string-append out "/bin"))  ; not necessary if we only need it as an external library ?
+                    (bindir (string-append out "/bin"))  ; not necessary if we only need it as an external library ?
                     (incdir (string-append out "/include"))
                     (libdir (string-append out "/lib")))
-                    ;(install-file "./src/voro++" bindir) ; not necessary if we only need it as an external library ?
+                    (install-file "./src/voro++" bindir) ; not necessary if we only need it as an external library ?
                     (for-each (lambda (f) (install-file f incdir))
                              (find-files "./src/" "\\.hh"))
                     (for-each (lambda (f) (install-file f libdir))
@@ -209,35 +211,44 @@
       ;; It is also a nice exercice with new dependances. ;;
       "-DPKG_KIM=yes"
       "-DDOWNLOAD_KIM=no"
-      "-C ../cmake/presets/most.cmake"                      ; manually added by DB
-      "-DDOWNLOAD_VORONOI=no"                                ; manually added by DB
-      "-DPKG_VORONOI=yes"                                    ; DB currently adding it
+      "-C ../cmake/presets/most.cmake"                        ; manually added by DB
+      "-DDOWNLOAD_VORONOI=no"                                 ; manually added by DB
+      "-DPKG_VORONOI=yes"                                     ; DB currently adding it
       (string-append "-DVORO_LIBRARY="                        ; Pointing directly to libvoro++.a
         (assoc-ref %build-inputs "voro-lib") "/lib/libvoro++.a") ; as recommended in the documentation (DB)
       (string-append "-DVORO_INCLUDE_DIR="                    ; Pointing to the directory with voro++ include files
-        (assoc-ref %build-inputs "voro-lib") "/include")         ; as recommended in the documentation (DB)
-      "-D LAMMPS_MACHINE=mpi"                               ; manually added by DB
-      "-D BUILD_MPI=yes"                                    ; manually added by DB
+        (assoc-ref %build-inputs "voro-lib") "/include")      ; as recommended in the documentation (DB)
+      "-D LAMMPS_MACHINE=mpi"                                 ; manually added by DB
+      "-D BUILD_MPI=yes"                                      ; manually added by DB
       ;; End of the additions ... for now ;) ;;
       (string-append "-DN2P2_DIR=" (assoc-ref %build-inputs "n2p2-lib"))
-      (string-append "-DCMAKE_INSTALL_PREFIX=" (assoc-ref %outputs "out")))
+      (string-append "-DCMAKE_INSTALL_PREFIX=" (assoc-ref %outputs "out"))
+      ;"-LAH" ;; [DB] TO DEBUG CMAKE FLAGS
+      "-DDOWNLOAD_POTENTIALS=off" ;; [DB] SOLUTION 1
+      "-DUSE_SPGLIB=off"          ;; [DB] SOLUTION 1
+      ;; [DB] SOLUTION 2 (start) NOT WORKING
+      ;"-DTLS_VERIFY=on"
+      ;(string-append "-DOPENSSL_ROOT_DIR="
+      ;  (assoc-ref %build-inputs "openssl"))
+      ;(string-append "-DOPENSSL_INCLUDE_DIR="
+      ;  (assoc-ref %build-inputs "openssl") "/include")
+      ;(string-append "-DOPENSSL_LIBRARIES="
+      ;  (assoc-ref %build-inputs "openssl") "/lib")
+      ;; [DB] SOLUTION 2 (finish) NOT WORKINGs
+      )
       #:phases
       (modify-phases %standard-phases
         (add-after 'unpack 'post-unpack
           (lambda* (#:key outputs inputs #:allow-other-keys)
             (mkdir-p "./build")
             (chdir "./build")
-            (substitute* "../cmake/Modules/LAMMPSUtils.cmake" ; [DB] NECESSARY FOR VERSION stable_2Aug2023
-              (("if.NOT sum STREQUAL oldsum.")                ; [DB] AND LATER BECAUSE FetchPotentials() 
-               "if(FALSE)")                                   ; [DB] CRASHES AT DOWNLOAD (GUIX ONLY, HOSTNAME
-            )                                                 ; [DB] NOT RESOLVED) AND I CAN'T UNDERSTAND WHY.
           )
         )
         (replace 'configure
           (lambda* (#:key inputs outputs configure-flags #:allow-other-keys)
             (let ((out (assoc-ref outputs "out")))
               (apply invoke "cmake" "../cmake" configure-flags)))))
-              ;(invoke "cmake" "--version"))))) ; 3.24.2 ;; [DB] NOT CAUSING THE HASH PROBLEM -- SEE ABOVE
+              ;(invoke "openssl" "help")))))
       #:tests? #f))
   (inputs
     `(("python" ,python-wrapper)      ; not sure it is mandatory as we don't build the python utilitaries
@@ -279,6 +290,7 @@
                                       ; it can easily be worked around. Not done because it is slower ?
                                       ; or less reproducible ? (more likely)
       ("openmpi" ,openmpi)            ; covers for openmpi-bin ? libopenmpi-dev ? mpi-default-bin ?
+      ;("openssl" ,openssl)           ;; [DB] SOLUTION 2 NOT WORKING
       ("ffmpeg" ,ffmpeg)              ; covers for ffmpeg
       ("libpng" ,libpng)              ; covers for libpng-dev
       ("libjpeg" ,libjpeg-turbo)      ; covers for libjpeg-dev
