@@ -12,6 +12,10 @@
   #:use-module (gnu packages compression)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages python)
+  #:use-module (gnu packages bash)
+  #:use-module (gnu packages perl)
+  #:use-module (gnu packages ruby)
+  #:use-module (gnu packages shells)
   #:use-module (gnu packages commencement)
   #:use-module (gnu packages gl)
   #:use-module (gnu packages xorg))
@@ -23,7 +27,7 @@
     (source
       (origin
         (method url-fetch)
-        (uri "https://www.ks.uiuc.edu/Research/vmd/vmd-1.9.4/files/alpha/vmd-1.9.4a57.src.tar.gz")
+        (uri (string-append "https://www.ks.uiuc.edu/Research/vmd/vmd-1.9.4/files/alpha/vmd-" version ".src.tar.gz"))
         (sha256 (base32 "0y86hrbr69qbhifrifj6ynq0rahanmpq1q38j3c3d4wnbl68s9yy"))))
     (inputs
      (list 
@@ -33,8 +37,13 @@
       fltk
       libpng
       zlib
+      python
       python-numpy
       python-wrapper
+      perl
+      ruby
+      tcsh
+      bash-minimal
       gcc-toolchain-12
       guile-opengl
       libxinerama
@@ -45,26 +54,63 @@
     (arguments
       `(#:phases
         (modify-phases %standard-phases
-          (add-after 'unpack 'compile-plugins
+          (add-after 'unpack 'post-unpack
             (lambda* (#:key outputs inputs #:allow-other-keys)
+              ; VMD works with environment varieables, setting them
+              (setenv "VMDINSTALLNAME" "vmd")
+              (setenv "VMDINSTALLBINDIR" (string-append (assoc-ref outputs "out") "/bin"))
+              (setenv "VMDINSTALLLIBRARYDIR" (string-append (assoc-ref outputs "out") "/lib"))
+              (setenv "PLUGINDIR" (string-append (assoc-ref outputs "out") "/lib/plugins"))
+              (setenv "PYTHON_INCLUDE_DIR" (string-append (assoc-ref inputs "python") "/include/python3.10"))
+              (setenv "PYTHON_LIBRARY_DIR" (string-append (assoc-ref inputs "python") "/lib"))
+              (setenv "NUMPY_INCLUDE_DIR" (string-append (assoc-ref inputs "python-numpy") "/lib/python3.10/site-packages/numpy/core/include/numpy"))
+              (setenv "NUMPY_LIBRARY_DIR" (string-append (assoc-ref inputs "python-numpy") "/lib/python3.10/site-packages/numpy/core/lib"))
+              ; Plugins and the main VMD folder are separated and need to be put togehter
               (chdir "../vmd-1.9.4a57")
-              (invoke "mv" "../plugins" ".")
-              (invoke "pwd")
-              (chdir )
+              (invoke "mv" "../plugins" ".")    
+              ; Default configure options are of little interest to us
+              (substitute* "configure.options"
+               (("LINUXAMD64 OPENGL OPENGLPBUFFER FLTK TK ACTC CUDA CXX11 IMD LIBSBALL XINERAMA XINPUT LIBOPTIX LIBOSPRAY LIBTACHYON LIBPNG ZLIB VRPN NETCDF COLVARS TCL PYTHON PTHREADS NUMPY SILENT ICC")
+                 "LINUXAMD64 GCC OPENGL OPENGLPBUFFER FLTK TK COLVARS IMD SILENT XINPUT TCL PTHREADS LIBPNG ZLIB NETCDF PYTHON NUMPY XINERAMA"))
+              ; In ./configure, paths are hard coded which needs to be guix-adapted
+             ; (invoke "head" "-n" "23" "./configure")
+              ; (substitute* "configure"
+              ;   (("install_bin_dir=\"/usr/local/bin\"")
+              ;    (string-append
+              ;     "install_bin_dir=\""
+              ;     (assoc-ref outputs "out")
+              ;     "/bin\"")))
+             ; (substitute* "configure"
+             ;   (("install_library_dir=\"/usr/local/lib/.*install_name\"")
+             ;    (string-append
+             ;     "install_library_dir=\"" (assoc-ref outputs "out")
+             ;     "/lib\"")))
             )          
           )
-          ;(delete 'configure)
-          ;(replace 'install
+          (add-after 'patch-source-shebangs 'compile-plugins
+            (lambda* (#:key outputs inputs #:allow-other-keys)
+              (chdir "plugins")
+              (invoke "make" "distrib")
+              (chdir "..")
+            )
+          )
+          (replace 'configure
+            (lambda* (#:key outputs inputs #:allow-other-keys)
+              (invoke "./configure")
+              (chdir "src")
+              (substitute* "Makefile" (("-I../plugins/LINUXAMD64") "-I../plugins/compile/lib_LINUXAMD64"))
+              (substitute* "Makefile" (("-L../plugins/LINUXAMD64") "-L../plugins/compile/lib_LINUXAMD64"))
+              (substitute* "Makefile" (("/bin/sh") (string-append (assoc-ref inputs "bash-minimal") "/bin/sh")))
+              (invoke "head" "-n" "50" "Makefile")
+              (invoke "make")
+              (invoke "make" "install")
+            )
+          )
+          ; (add-after 'patch-source-shebangs 'compile-plugins
           ;   (lambda* (#:key outputs inputs #:allow-other-keys)
-          ;      (let* ((out (assoc-ref outputs "out"))
-          ;          (bindir (string-append out "/bin"))  ; not necessary if we only need it as an external library ?
-          ;          (incdir (string-append out "/include"))
-          ;          (libdir (string-append out "/lib")))
-          ;          (install-file "./src/voro++" bindir) ; not necessary if we only need it as an external library ?
-          ;           (for-each (lambda (f) (install-file f incdir))
-          ;                   (find-files "./src/" "\\.hh"))
-          ;          (for-each (lambda (f) (install-file f libdir))
-          ;                   (find-files "./src/" "\\.a")))))
+
+          ;   )
+          ; )
         )
         #:tests? #f))
     (home-page "https://www.ks.uiuc.edu/Research/vmd/")
