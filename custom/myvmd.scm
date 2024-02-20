@@ -42,8 +42,31 @@
       libx11
       mesa))
     (build-system gnu-build-system)
-    (arguments (list 
-                     #:tests? #f))
+    (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-after 'unpack 'compile-plugins
+            (lambda* (#:key outputs inputs #:allow-other-keys)
+              (chdir "../vmd-1.9.4a57")
+              (invoke "mv" "../plugins" ".")
+              (invoke "pwd")
+              (chdir )
+            )          
+          )
+          ;(delete 'configure)
+          ;(replace 'install
+          ;   (lambda* (#:key outputs inputs #:allow-other-keys)
+          ;      (let* ((out (assoc-ref outputs "out"))
+          ;          (bindir (string-append out "/bin"))  ; not necessary if we only need it as an external library ?
+          ;          (incdir (string-append out "/include"))
+          ;          (libdir (string-append out "/lib")))
+          ;          (install-file "./src/voro++" bindir) ; not necessary if we only need it as an external library ?
+          ;           (for-each (lambda (f) (install-file f incdir))
+          ;                   (find-files "./src/" "\\.hh"))
+          ;          (for-each (lambda (f) (install-file f libdir))
+          ;                   (find-files "./src/" "\\.a")))))
+        )
+        #:tests? #f))
     (home-page "https://www.ks.uiuc.edu/Research/vmd/")
     (synopsis "VMD is a molecular visualization program for displaying, animating, and analyzing
                large biomolecular systems using 3-D graphics and built-in scripting.")
