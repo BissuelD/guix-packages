@@ -56,61 +56,53 @@
         (modify-phases %standard-phases
           (add-after 'unpack 'post-unpack
             (lambda* (#:key outputs inputs #:allow-other-keys)
-              ; VMD works with environment varieables, setting them
+              ; VMD works with environment variables, setting them
               (setenv "VMDINSTALLNAME" "vmd")
               (setenv "VMDINSTALLBINDIR" (string-append (assoc-ref outputs "out") "/bin"))
               (setenv "VMDINSTALLLIBRARYDIR" (string-append (assoc-ref outputs "out") "/lib"))
               (setenv "PLUGINDIR" (string-append (assoc-ref outputs "out") "/lib/plugins"))
-              (setenv "PYTHON_INCLUDE_DIR" (string-append (assoc-ref inputs "python") "/include/python3.10"))
-              (setenv "PYTHON_LIBRARY_DIR" (string-append (assoc-ref inputs "python") "/lib"))
-              (setenv "NUMPY_INCLUDE_DIR" (string-append (assoc-ref inputs "python-numpy") "/lib/python3.10/site-packages/numpy/core/include/numpy"))
-              (setenv "NUMPY_LIBRARY_DIR" (string-append (assoc-ref inputs "python-numpy") "/lib/python3.10/site-packages/numpy/core/lib"))
-              ; Plugins and the main VMD folder are separated and need to be put togehter
               (chdir "../vmd-1.9.4a57")
               (invoke "mv" "../plugins" ".")    
               ; Default configure options are of little interest to us
               (substitute* "configure.options"
                (("LINUXAMD64 OPENGL OPENGLPBUFFER FLTK TK ACTC CUDA CXX11 IMD LIBSBALL XINERAMA XINPUT LIBOPTIX LIBOSPRAY LIBTACHYON LIBPNG ZLIB VRPN NETCDF COLVARS TCL PYTHON PTHREADS NUMPY SILENT ICC")
                  "LINUXAMD64 GCC OPENGL OPENGLPBUFFER FLTK TK COLVARS IMD SILENT XINPUT TCL PTHREADS LIBPNG ZLIB NETCDF PYTHON NUMPY XINERAMA"))
-              ; In ./configure, paths are hard coded which needs to be guix-adapted
-             ; (invoke "head" "-n" "23" "./configure")
-              ; (substitute* "configure"
-              ;   (("install_bin_dir=\"/usr/local/bin\"")
-              ;    (string-append
-              ;     "install_bin_dir=\""
-              ;     (assoc-ref outputs "out")
-              ;     "/bin\"")))
-             ; (substitute* "configure"
-             ;   (("install_library_dir=\"/usr/local/lib/.*install_name\"")
-             ;    (string-append
-             ;     "install_library_dir=\"" (assoc-ref outputs "out")
-             ;     "/lib\"")))
             )          
           )
           (add-after 'patch-source-shebangs 'compile-plugins
             (lambda* (#:key outputs inputs #:allow-other-keys)
+              (for-each (lambda (f) 
+                (substitute* f (("ltcl8.5") "ltcl8.6")))
+                  `("./configure" "./plugins/cionize/Makefile.specialbuilds" "./plugins/Make-arch" "./plugins/Make-arch.debug" "./src/Makefile"))
+               (for-each (lambda (f) 
+                (substitute* f (("ltk8.5") "ltk8.6")))
+                  `("configure" "./src/Makefile"))
+              (for-each (lambda (f) 
+                (substitute* f (("lpython2.[0-9a-z*]") "lpython3.10")))
+                  `("configure" "./src/Makefile"))
+              (invoke "grep" "ltcl" "configure")
               (chdir "plugins")
+              (invoke "make" "TCLLDFLAGS=-ltcl8.6" "LINUXAMD64")
               (invoke "make" "distrib")
               (chdir "..")
             )
           )
           (replace 'configure
             (lambda* (#:key outputs inputs #:allow-other-keys)
+              (setenv "PYTHON_INCLUDE_DIR" (string-append (assoc-ref inputs "python") "/include/python3.10"))
+              (setenv "PYTHON_LIBRARY_DIR" (string-append (assoc-ref inputs "python") "/lib"))
+              (setenv "NUMPY_INCLUDE_DIR" (string-append (assoc-ref inputs "python-numpy") "/lib/python3.10/site-packages/numpy/core/include"))
+              (setenv "NUMPY_LIBRARY_DIR" (string-append (assoc-ref inputs "python-numpy") "/lib/python3.10/site-packages/numpy/core/lib"))
               (invoke "./configure")
               (chdir "src")
               (substitute* "Makefile" (("-I../plugins/LINUXAMD64") "-I../plugins/compile/lib_LINUXAMD64"))
               (substitute* "Makefile" (("-L../plugins/LINUXAMD64") "-L../plugins/compile/lib_LINUXAMD64"))
               (substitute* "Makefile" (("/bin/sh") (string-append (assoc-ref inputs "bash-minimal") "/bin/sh")))
-              (invoke "head" "-n" "50" "Makefile")
               (invoke "make")
               (invoke "make" "install")
             )
           )
-          ; (add-after 'patch-source-shebangs 'compile-plugins
-          ;   (lambda* (#:key outputs inputs #:allow-other-keys)
-
-          ;   )
-          ; )
+          (delete 'validate-runpath)
         )
         #:tests? #f))
     (home-page "https://www.ks.uiuc.edu/Research/vmd/")
@@ -126,7 +118,4 @@
                   simulation. In particular, VMD can act as a graphical front end for an external MD
                   program by displaying and animating a molecule undergoing simulation on a remote computer.")
     (license license:ncsa)))
-
-;; This allows you to run guix shell -f example.scm.
-;; Remove this line if you just want to define a package.
 myvmd
