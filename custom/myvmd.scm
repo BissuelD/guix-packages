@@ -56,22 +56,11 @@
         (modify-phases %standard-phases
           (add-after 'unpack 'post-unpack
             (lambda* (#:key outputs inputs #:allow-other-keys)
-              ; FOR  DEBUG
-              (setenv "FINALDIR" (string-append (assoc-ref outputs "out") ""))
-              (setenv "BUILDDIR" (getenv "PWD"))
-              (display (getenv "FINALDIR"))
-              (display (getenv "BUILDDIR"))
               ; VMD works with environment variables, setting them
               (setenv "VMDINSTALLNAME" "vmd")
               (setenv "VMDINSTALLBINDIR" (string-append (assoc-ref outputs "out") "/bin"))
               (setenv "VMDINSTALLLIBRARYDIR" (string-append (assoc-ref outputs "out") "/lib"))
               (setenv "PLUGINDIR" (string-append (assoc-ref outputs "out") "/lib/plugins"))
-              ;(setenv "VMDINSTALLBINDIR" (string-append (getenv "BUILDDIR") "/plugins/bin"))
-              ;(setenv "VMDINSTALLLIBRARYDIR" (string-append (getenv "BUILDDIR") "/plugins/lib"))
-              ;(setenv "PLUGINDIR" (string-append (getenv "BUILDDIR") "/plugins/include/compiled-plugins"))
-              (mkdir-p (getenv "VMDINSTALLBINDIR"))
-              (mkdir-p (getenv "VMDINSTALLLIBRARYDIR"))
-              (mkdir-p (getenv "PLUGINDIR"))
               (chdir "../vmd-1.9.4a57")
               (invoke "mv" "../plugins" ".")
               ; Default configure options are of little interest to us
@@ -92,7 +81,11 @@
                 (substitute* f (("lpython2.[0-9a-z*]") "lpython3.10")))
                   `("configure" "./src/Makefile"))
               (chdir "plugins")
-              (invoke "make" "TCLLDFLAGS=-ltcl8.6" "LINUXAMD64")
+              (invoke "make"
+                (string-append "TCLINC=-I" (assoc-ref inputs "tcl") "/include")
+                (string-append "TCLLIB=-L" (assoc-ref inputs "tcl") "/lib")
+                "TCLLDFLAGS=-ltcl8.6"
+                "LINUXAMD64")
               (invoke "make" "distrib")
               (chdir "..")
             )
