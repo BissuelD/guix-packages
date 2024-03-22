@@ -18,6 +18,7 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-xyz)
+  #:use-module (myquantum-espresso)
 )
 
 (define-public libxc
@@ -49,6 +50,7 @@
     (synopsis "")
     (description "")
     (license license:mpl2.0)))
+
 
 (define-public myabinit
   (package
@@ -89,15 +91,48 @@
               (substitute* (find-files "./bindings")
                 (("/usr/bin/env python")
                 (string-append (assoc-ref inputs "python") "/bin/python3")))
+              (substitute* (find-files "./bindings")
+                (("/bin/sh")
+                (which "sh")))
+              (substitute* (find-files "." "\\.sh$")
+                (("/bin/sh")
+                (which "sh")))
               (substitute* (find-files "./developers")
                 (("/bin/csh")
                 (which "sh")))
               (substitute* (find-files "./scripts" "\\.py$")
                 (("/usr/bin/env python")
                 (string-append (assoc-ref inputs "python") "/bin/python3")))
+              (substitute* (find-files "./scripts/post_processing" "\\.py$")
+                (("/usr/bin/python")
+                (string-append (assoc-ref inputs "python") "/bin/python3")))
+              (substitute* (find-files "./scripts/pre_processing" "\\.py$")
+                (("/usr/bin/python")
+                (string-append (assoc-ref inputs "python") "/bin/python3")))
+              (substitute* (find-files "./scripts/configure/abinit_config" "\\.py$")
+                (("/usr/bin/env python")
+                (string-append (assoc-ref inputs "python") "/bin/python3")))
+              (substitute* (find-files "./scripts/configure/abinit_config" "abinit-textconfig")
+                (("/usr/bin/python")
+                (string-append (assoc-ref inputs "python") "/bin/python3")))
+              (substitute* (find-files "./scripts/configure/abinit_config" "\\.py$")
+                (("/usr/bin/python")
+                (string-append (assoc-ref inputs "python") "/bin/python3")))
               (substitute* (find-files "./tests" "\\.py$")
                 (("/usr/bin/env python")
                 (string-append (assoc-ref inputs "python") "/bin/python3")))
+              (substitute* (find-files "./tests/config/scripts")
+                (("/usr/bin/env python")
+                (string-append (assoc-ref inputs "python") "/bin/python3")))
+              (substitute* (find-files "./doc/config/scripts")
+                (("/usr/bin/env python")
+                (string-append (assoc-ref inputs "python") "/bin/python3")))
+              (substitute* (find-files "./doc/tutorial/paral_moldyn_assets" "\\.py$")
+                (("/usr/bin/env  python")
+                (string-append (assoc-ref inputs "python") "/bin/python3")))
+              (substitute* "configure.ac"
+                (("/bin/sh")
+                (which "sh")))
               ))
         (replace 'install
              (lambda* (#:key outputs inputs #:allow-other-keys)
@@ -135,7 +170,7 @@
        ("autoconf" ,autoconf)
        ("automake" ,automake)
        ("libtool" ,libtool)
-       ; Wannier90 ---> need to package first ; not mandatory
+       ("wannier90" ,wannier90) ; -> copied the one from QE ; can we use it instead ? 
        ))
   (native-search-paths
     (lambda* (#:key outputs inputs version #:allow-other-keys)
