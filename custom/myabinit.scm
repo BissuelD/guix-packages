@@ -73,73 +73,11 @@
       (modify-phases %standard-phases
         (add-after `unpack `patch-interpreters
            (lambda* (#:key inputs #:allow-other-keys)
-              ;;;;; NOT SURE ALL OF THEM ARE USEFUL
-              ; PYTHON INTERPRETERS ;
               (substitute* (find-files "." "\\.py$")
                 (("/usr/bin/env python3")
                 (string-append (assoc-ref inputs "python") "/bin/python3"))
                 (("/usr/bin/env python")
                 (string-append (assoc-ref inputs "python") "/bin/python3")))
-              ;  (substitute* (find-files "./bindings")                         ; DO
-              ;   (("/usr/bin/env python")                                      ; NOT
-              ;   (string-append (assoc-ref inputs "python") "/bin/python3")))  ; UNCOMMENT
-              ; (substitute* (find-files "./scripts" "\\.py$")
-              ;   (("/usr/bin/env python")
-              ;   (string-append (assoc-ref inputs "python") "/bin/python3")))
-              ; (substitute* (find-files "./scripts/post_processing" "\\.py$")
-              ;   (("/usr/bin/python")
-              ;   (string-append (assoc-ref inputs "python") "/bin/python3")))
-              ; (substitute* (find-files "./scripts/pre_processing" "\\.py$")
-              ;   (("/usr/bin/python")
-              ;   (string-append (assoc-ref inputs "python") "/bin/python3")))
-              ; (substitute* (find-files "./scripts/configure/abinit_config" "\\.py$")
-              ;   (("/usr/bin/env python")
-              ;   (string-append (assoc-ref inputs "python") "/bin/python3")))
-              ; (substitute* (find-files "./scripts/configure/abinit_config" "abinit-textconfig")
-              ;   (("/usr/bin/python")
-              ;   (string-append (assoc-ref inputs "python") "/bin/python3")))
-              ; (substitute* (find-files "./scripts/configure/abinit_config" "\\.py$")
-              ;   (("/usr/bin/python")
-              ;   (string-append (assoc-ref inputs "python") "/bin/python3")))
-              ; (substitute* (find-files "./tests" "\\.py$")
-              ;   (("/usr/bin/env python")
-              ;   (string-append (assoc-ref inputs "python") "/bin/python3")))
-              ; (substitute* (find-files "./tests/config/scripts")
-              ;   (("/usr/bin/env python")
-              ;   (string-append (assoc-ref inputs "python") "/bin/python3")))
-              ; (substitute* (find-files "./doc/config/scripts")
-              ;   (("/usr/bin/env python")
-              ;   (string-append (assoc-ref inputs "python") "/bin/python3")))
-              ; (substitute* (find-files "./doc/tutorial/paral_moldyn_assets" "\\.py$")
-              ;   (("/usr/bin/env  python")
-              ;   (string-append (assoc-ref inputs "python") "/bin/python3")))
-              ; PERL INTERPRETERS ;
-              ; (substitute* (find-files "." "\\.pl$")
-              ;   (("/bin/env perl")
-              ;   (string-append (assoc-ref inputs "perl") "/bin/perl"))) ; MAYBE NEEDED ?
-              ; SHELL INTERPRETERS ;
-              ; (substitute* (find-files "." "config\\$")
-              ;   (("/bin/sh")
-              ;   (which "sh")))
-              ; (substitute* (find-files "./bindings")
-              ;   (("/bin/sh")
-              ;   (which "sh")))
-              ; (substitute* (find-files "." "\\.sh$")
-              ;   (("/bin/sh")
-              ;   (which "sh")))
-              ; (substitute* (find-files "./developers")
-              ;   (("/bin/csh")
-              ;   (which "sh")))
-              ; (substitute* "configure.ac"
-              ;   (("/bin/sh")
-              ;   (which "sh")))
-              ; (substitute* "shared/common/configure.ac"
-              ;   (("/bin/sh")
-              ;   (which "sh")))
-              ; (substitute* "tests/pymods/yaml_tools/explore_test.py"
-              ;   (("/bin/sh")
-              ;   (which "sh")))
-              ; MIXED INTERPRETERS ;
               (substitute* (find-files "./config")
                 (("/bin/sh")
                 (which "sh"))
