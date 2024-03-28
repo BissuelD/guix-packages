@@ -19,36 +19,6 @@
   #:use-module (myquantum-espresso)
 )
 
-(define-public libxc
-  (package
-    (name "libxc")
-    (version "5.1.5")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-         (url "https://gitlab.com/libxc/libxc.git")
-         (commit version)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32
-         "0cy3x2zn1bldc5i0rzislfbc8h4nqgds445jkfqjv0d1shvdy0zn"))))
-    (build-system gnu-build-system)
-    (native-inputs
-     `(("automake" ,automake)
-       ("autoconf" ,autoconf)
-       ("bash" ,bash)
-       ("gfortran" ,gfortran)
-       ("libtool" ,libtool)
-       ("perl" ,perl)
-       ("pkg-config" ,pkg-config)))
-    (arguments
-     `(#:configure-flags (list "--enable-shared")))
-    (home-page "")
-    (synopsis "")
-    (description "")
-    (license license:mpl2.0)))
-
 
 (define-public myabinit
   (package
@@ -115,13 +85,38 @@
        ("automake" ,automake)
       )
   )
-  (native-search-paths
-    (lambda* (#:key outputs inputs version #:allow-other-keys)
-      (list (assoc-ref inputs "bash"))
-    )
-  )
   (synopsis "ABINIT is a software suite to calculate the optical, mechanical, vibrational, and other observable properties of materials.")
   (description "Starting from the quantum equations of density functional theory, you can build up to advanced applications with perturbation theories based on DFT, and many-body Green's functions (GW and DMFT). ABINIT can calculate molecules, nanostructures and solids with any chemical composition, and comes with several complete and robust tables of atomic potentials.")
   (home-page "https://www.abinit.org/")
   (license license:gpl2+)))
   myabinit
+
+(define-public libxc
+  (package
+    (name "libxc")
+    (version "5.1.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+         (url "https://gitlab.com/libxc/libxc.git")
+         (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0cy3x2zn1bldc5i0rzislfbc8h4nqgds445jkfqjv0d1shvdy0zn"))))
+    (build-system gnu-build-system)
+    (native-inputs
+     `(("automake" ,automake)
+       ("autoconf" ,autoconf)
+       ("bash" ,bash)
+       ("gfortran" ,gfortran)
+       ("libtool" ,libtool)
+       ("perl" ,perl)
+       ("pkg-config" ,pkg-config)))
+    (arguments
+     `(#:configure-flags (list "--enable-shared")))
+    (home-page "")
+    (synopsis "")
+    (description "")
+    (license license:mpl2.0)))
