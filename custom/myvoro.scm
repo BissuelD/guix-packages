@@ -1,4 +1,4 @@
-(define-module (myvoro++)
+(define-module (myvoro)
       #:use-module ((guix licenses) #:prefix license:)
       #:use-module (guix packages)
       #:use-module (guix download)
@@ -9,9 +9,9 @@
       )
 
 
-(define-public myvoro++
+(define-public myvoro
   (package
-  (name "myvoro++")
+  (name "myvoro")
   (version "0.4.6")
   (source (origin
             (method url-fetch)
@@ -45,4 +45,4 @@
   (description "Voro++ is a software library for carrying out three-dimensional computations of the Voronoi tessellation. A distinguishing feature of the Voro++ library is that it carries out cell-based calculations, computing the Voronoi cell for each particle individually, rather than computing the Voronoi tessellation as a global network of vertices and edges. It is particularly well-suited for applications that rely on cell-based statistics, where features of Voronoi cells (eg. volume, centroid, number of faces) can be used to analyze a system of particles.")
   (home-page "http://math.lbl.gov/voro++/")
   (license license:gpl2+)))
-  myvoro++
+  myvoro

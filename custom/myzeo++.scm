@@ -2,7 +2,9 @@
   #:use-module (guix)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (gnu packages)
-  #:use-module (guix build-system gnu))
+  #:use-module (guix build-system gnu)
+  ; #:use-module (myvoro)
+)
 
 (define-public myzeo++
   (package
@@ -19,6 +21,22 @@
     (arguments 
      `(#:phases 
         (modify-phases %standard-phases
+          ; (add-after 'unpack 'clean-unnecessary
+          ;   (lambda* (#:key inputs #:allow-other-keys)
+          ;     (delete-file-recursively "./voro++")
+          ;   )
+          ; )
+          ; (add-before 'build 'patch-voro
+          ;   (lambda* (#:key inputs #:allow-other-keys)
+          ;     (substitute* "Makefile"
+          ;       (("-Ivoro../src")
+          ;       (string-append "-I" (assoc-ref inputs "myvoro") "/include")))
+          ;     (substitute* "Makefile"
+          ;       (("-Lvoro../src")
+          ;       (string-append "-L" (assoc-ref inputs "myvoro") "/lib")))
+          ;     (invoke "cat" "Makefile")
+          ;   )
+          ; )
           (add-after 'unpack 'build-voro
             (lambda* (#:key outputs inputs native-inputs #:allow-other-keys)
               ; Builds voro++ before the actual build
@@ -40,6 +58,8 @@
           )
         )
        #:tests? #f))
+    ; (inputs
+    ;  `(("myvoro" ,myvoro)))
     (home-page "http://www.zeoplusplus.org/")
     (synopsis "Zeo++ is a open source software for performing high-throughput geometry-based analysis of porous materials and their voids.")
     (description "The main code provides capabilities to calculate the following: Pore diameters, Surface area and volume, Probe-occupiable volume, Per channel analysis, Pore Size Distribution (PSD), Hologram representations, Stochastic ray approaches, Distance grid calculations, Aid to Molecular Simulations, Structure analysis and File format conversion and visualization aids. The structure of the code makes it particularly well-suited to many problems in physics and materials science, where Voronoi cells can be a useful method of analyzing particle packings. ")
