@@ -42,6 +42,11 @@
               ; Builds voro++ before the actual build
               ; Question : I already have a voro++ package, but it is also shipped with this soft.
               ; Should I use the already existing guix voro++ package or use the one shipped here ?
+              ; Temporary answer :
+              ;   The voro++ version used by default by zeo++ is not the one packaged.
+              ;   It is also tough to determine which one it exactly is (version command weirdly set).
+              ;   When looking at the source code from two supposedly similar versions, it is possible
+              ;   zeo++' version has been slightly modified.
               (chdir "voro++/src")
               (invoke "make")
               (chdir "../..")
