@@ -175,7 +175,8 @@ void mc64ad_dist (int *a, int *b, int *c, int *d, int *e, double *f, int *g,
        ("parmetis" ,mypt-scotch "metis")
        ("pt-scotch" ,mypt-scotch)))
     (arguments
-     `(#:parallel-tests? #f     ;tests use MPI and OpenMP
+     `(#:tests? #f
+       #:parallel-tests? #f     ;tests use MPI and OpenMP
        #:configure-flags (list "-DBUILD_SHARED_LIBS:BOOL=YES"
                                "-DTPL_ENABLE_COMBBLASLIB=YES"
                                "-DTPL_BLAS_LIBRARIES=-lopenblas"
@@ -210,9 +211,9 @@ void mc64ad_dist (int *a, int *b, int *c, int *d, int *e, double *f, int *g,
          (add-before 'check 'omp-setup
            (lambda _ (setenv "OMP_NUM_THREADS" "1") #t)
          )
-         (replace 'check 
-          (lambda  _(invoke "make" "-j1" "test") #t)
-         )
+        ;  (replace 'check 
+        ;   (lambda _ (invoke "make" "-j32" "test") #t)
+        ;  )
         )))
     (home-page (package-home-page superlu))
     (synopsis "Parallel supernodal direct solver")

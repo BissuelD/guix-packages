@@ -31,7 +31,7 @@
         (sha256 (base32 "0y86hrbr69qbhifrifj6ynq0rahanmpq1q38j3c3d4wnbl68s9yy"))))
     (inputs
      (list 
-      tcl
+      ; tcl
       tk
       netcdf
       fltk
@@ -50,6 +50,11 @@
       libxi
       libx11
       mesa))
+      (propagated-inputs
+        (list
+          tcl
+        )
+      )
     (build-system gnu-build-system)
     (arguments
       `(#:phases
